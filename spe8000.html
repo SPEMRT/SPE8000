@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SPE 8000">
+<meta name="theme-color" content="#0a0a0e">
+<link rel="manifest" href="manifest.json">
+<title>PP-SPE 8000</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body {
+  background: #0a0a0e;
+  color: #dde0ea;
+  font-family: 'Segoe UI', sans-serif;
+  padding: 12px;
+  padding-top: env(safe-area-inset-top, 12px);
+  padding-bottom: env(safe-area-inset-bottom, 12px);
+  min-height: 100vh;
+}
+.header {
+  text-align: center;
+  padding: 10px 0 8px;
+  border-bottom: 1px solid #252535;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.header-icon {
+  width: 32px; height: 32px;
+  background: linear-gradient(135deg, #00d4ff, #0066aa);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+}
+.header-text h1 { font-size: 1.1rem; color: #00d4ff; letter-spacing: 0.12em; text-align: left; }
+.header-text p { font-size: 0.55rem; color: #606075; text-align: left; }
+.section {
+  background: #11111a; border: 1px solid #252535;
+  border-radius: 12px; padding: 12px; margin-bottom: 10px;
+}
+.connect-row { display: flex; gap: 8px; align-items: center; }
+.btn-connect {
+  flex: 1; padding: 11px; border-radius: 8px;
+  border: none; font-size: 0.8rem; font-weight: 700;
+  cursor: pointer; background: #00d4ff; color: #0a0a0e;
+}
+.btn-connect.bagli { background: #1a1a2a; color: #ff4466; border: 1px solid #ff4466; }
+.status-dot { width: 10px; height: 10px; border-radius: 50%; background: #ff4466; flex-shrink: 0; transition: all 0.3s; }
+.status-dot.connected { background: #00ff88; box-shadow: 0 0 6px rgba(0,255,136,0.5); }
+.status-text { font-size: 0.62rem; color: #606075; margin-top: 6px; text-align: center; }
+.label { font-size: 0.58rem; color: #606075; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px; }
+.mod-row { display: flex; gap: 8px; }
+.mod-btn {
+  flex: 1; padding: 13px; border-radius: 10px;
+  border: 2px solid #252535; background: #16161f;
+  color: #606075; font-size: 0.82rem; font-weight: 700; cursor: pointer;
+}
+.mod-btn.active-numune { border-color: #00d4ff; color: #00d4ff; background: rgba(0,212,255,0.1); }
+.mod-btn.active-yikama { border-color: #a855f7; color: #a855f7; background: rgba(168,85,247,0.1); }
+.mod-display { text-align: center; margin-top: 8px; font-size: 0.72rem; font-weight: 700; color: #606075; padding: 4px; border-radius: 6px; }
+.mod-display.numune { color: #00d4ff; background: rgba(0,212,255,0.06); }
+.mod-display.yikama { color: #a855f7; background: rgba(168,85,247,0.06); }
+.master-row { display: flex; gap: 8px; margin-bottom: 10px; }
+.master-btn { flex: 1; padding: 11px; border-radius: 10px; border: none; font-size: 0.75rem; font-weight: 700; cursor: pointer; }
+.btn-tumac { background: #00ff88; color: #0a0a0e; }
+.btn-tumkapat { background: #ff4466; color: white; }
+.kanallar { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+.kanal-card {
+  background: #11111a; border: 2px solid #252535;
+  border-radius: 12px; padding: 14px 10px; text-align: center;
+  cursor: pointer; user-select: none; transition: transform 0.1s;
+}
+.kanal-card:active { transform: scale(0.95); }
+.kanal-card.acik-numune { border-color: #00d4ff; background: rgba(0,212,255,0.08); }
+.kanal-card.acik-yikama { border-color: #a855f7; background: rgba(168,85,247,0.08); }
+.kanal-card.kapali-mod { opacity: 0.35; cursor: not-allowed; }
+.kanal-no { font-size: 0.58rem; color: #606075; letter-spacing: 0.08em; margin-bottom: 5px; }
+.kanal-led { width: 22px; height: 22px; border-radius: 50%; background: #1a1a2a; margin: 5px auto; border: 2px solid #353548; transition: all 0.2s; }
+.kanal-card.acik-numune .kanal-led { background: #00d4ff; box-shadow: 0 0 14px rgba(0,212,255,0.7); border-color: #00d4ff; }
+.kanal-card.acik-yikama .kanal-led { background: #a855f7; box-shadow: 0 0 14px rgba(168,85,247,0.7); border-color: #a855f7; }
+.kanal-durum { font-size: 0.6rem; color: #606075; font-weight: 600; }
+.kanal-card.acik-numune .kanal-durum { color: #00d4ff; }
+.kanal-card.acik-yikama .kanal-durum { color: #a855f7; }
+.log-box { background: #0a0a0e; border-radius: 8px; padding: 8px; height: 70px; overflow-y: auto; font-size: 0.58rem; font-family: monospace; color: #00ff88; line-height: 1.7; }
+
+#splash {
+  position: fixed; inset: 0; background: #0a0a0e;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  z-index: 999; transition: opacity 0.5s;
+}
+.splash-icon {
+  width: 90px; height: 90px;
+  background: linear-gradient(135deg, #00d4ff, #0044aa);
+  border-radius: 22px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.8rem; margin-bottom: 20px;
+  box-shadow: 0 0 40px rgba(0,212,255,0.3);
+}
+#splash h1 { font-size: 1.5rem; color: #00d4ff; letter-spacing: 0.2em; margin-bottom: 6px; }
+#splash p { font-size: 0.65rem; color: #606075; letter-spacing: 0.1em; }
+.splash-bar { width: 120px; height: 3px; background: #1a1a2a; border-radius: 3px; margin-top: 30px; overflow: hidden; }
+.splash-fill { height: 100%; width: 0; background: #00d4ff; border-radius: 3px; animation: fill 1.5s ease forwards; }
+@keyframes fill { to { width: 100%; } }
+</style>
+</head>
+<body>
+
+<div id="splash">
+  <div class="splash-icon">🧪</div>
+  <h1>PP-SPE 8000</h1>
+  <p>Pozitif Basınçlı SPE Sistemi</p>
+  <div class="splash-bar"><div class="splash-fill"></div></div>
+</div>
+
+<div class="header">
+  <div class="header-icon">🧪</div>
+  <div class="header-text">
+    <h1>PP-SPE 8000</h1>
+    <p>Pozitif Basınçlı SPE Kontrol Paneli</p>
+  </div>
+</div>
+
+<div class="section">
+  <div class="connect-row">
+    <div class="status-dot" id="statusDot"></div>
+    <button class="btn-connect" id="btnConnect" onclick="baglan()">🔵 Bluetooth Bağlan</button>
+  </div>
+  <div class="status-text" id="statusText">Bağlı değil — Bağlan butonuna bas</div>
+</div>
+
+<div class="section">
+  <div class="label">Hat Seçimi</div>
+  <div class="mod-row">
+    <button class="mod-btn" id="btnNumune" onclick="modSec('NUMUNE')">💧 NUMUNE</button>
+    <button class="mod-btn" id="btnYikama" onclick="modSec('YIKAMA')">🧪 YIKAMA</button>
+  </div>
+  <div class="mod-display" id="modDisplay">● MOD: KAPALI</div>
+</div>
+
+<div class="master-row">
+  <button class="master-btn btn-tumac" onclick="komutGonder('TUMAC')">✅ Tümünü Aç</button>
+  <button class="master-btn btn-tumkapat" onclick="komutGonder('TUMKAPAT')">❌ Tümünü Kapat</button>
+</div>
+
+<div class="kanallar">
+  <div class="kanal-card kapali-mod" id="kanal1" onclick="kanalToggle(1)"><div class="kanal-no">KANAL 1</div><div class="kanal-led"></div><div class="kanal-durum">KAPALI</div></div>
+  <div class="kanal-card kapali-mod" id="kanal2" onclick="kanalToggle(2)"><div class="kanal-no">KANAL 2</div><div class="kanal-led"></div><div class="kanal-durum">KAPALI</div></div>
+  <div class="kanal-card kapali-mod" id="kanal3" onclick="kanalToggle(3)"><div class="kanal-no">KANAL 3</div><div class="kanal-led"></div><div class="kanal-durum">KAPALI</div></div>
+  <div class="kanal-card kapali-mod" id="kanal4" onclick="kanalToggle(4)"><div class="kanal-no">KANAL 4</div><div class="kanal-led"></div><div class="kanal-durum">KAPALI</div></div>
+  <div class="kanal-card kapali-mod" id="kanal5" onclick="kanalToggle(5)"><div class="kanal-no">KANAL 5</div><div class="kanal-led"></div><div class="kanal-durum">KAPALI</div></div>
+  <div class="kanal-card kapali-mod" id="kanal6" onclick="kanalToggle(6)"><div class="kanal-no">KANAL 6</div><div class="kanal-led"></div><div class="kanal-durum">KAPALI</div></div>
+  <div class="kanal-card kapali-mod" id="kanal7" onclick="kanalToggle(7)"><div class="kanal-no">KANAL 7</div><div class="kanal-led"></div><div class="kanal-durum">KAPALI</div></div>
+  <div class="kanal-card kapali-mod" id="kanal8" onclick="kanalToggle(8)"><div class="kanal-no">KANAL 8</div><div class="kanal-led"></div><div class="kanal-durum">KAPALI</div></div>
+</div>
+
+<div class="section">
+  <div class="label">Sistem Logu</div>
+  <div class="log-box" id="logBox">Sistem hazır...<br></div>
+</div>
+
+<script>
+// Splash
+setTimeout(() => {
+  const s = document.getElementById('splash');
+  s.style.opacity = '0';
+  setTimeout(() => s.style.display = 'none', 500);
+}, 1800);
+
+// Service Worker kaydet
+if('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(e => console.log(e));
+}
+
+let port = null;
+let bagliMi = false;
+let mevcutMod = "KAPALI";
+let kanalDurum = [false,false,false,false,false,false,false,false];
+let durumInterval = null;
+
+async function baglan() {
+  if(bagliMi) { await baglantiKes(); return; }
+  try {
+    port = await navigator.serial.requestPort();
+    await port.open({ baudRate: 9600 });
+    bagliMi = true;
+    guncelleBaglantiUI(true);
+    log("✅ Bağlandı!");
+    okumayaBasla();
+    durumInterval = setInterval(() => komutGonder('DURUM'), 2000);
+  } catch(e) { log("❌ Hata: " + e.message); }
+}
+
+async function baglantiKes() {
+  try {
+    if(durumInterval) clearInterval(durumInterval);
+    if(port) { await port.close(); port = null; }
+  } catch(e) {}
+  bagliMi = false;
+  mevcutMod = "KAPALI";
+  kanalDurum = [false,false,false,false,false,false,false,false];
+  guncelleBaglantiUI(false);
+  guncelleTumUI();
+  log("🔴 Bağlantı kesildi");
+}
+
+function guncelleBaglantiUI(bagli) {
+  document.getElementById('statusDot').className = 'status-dot' + (bagli ? ' connected' : '');
+  const btn = document.getElementById('btnConnect');
+  btn.textContent = bagli ? '🔴 Bağlantıyı Kes' : '🔵 Bluetooth Bağlan';
+  btn.className = 'btn-connect' + (bagli ? ' bagli' : '');
+  document.getElementById('statusText').textContent = bagli ? '✅ Bağlı — PP-SPE 8000 hazır' : 'Bağlı değil — Bağlan butonuna bas';
+}
+
+async function komutGonder(komut) {
+  if(!bagliMi || !port) { if(komut !== 'DURUM') log("❌ Önce bağlanın!"); return; }
+  try {
+    const w = port.writable.getWriter();
+    await w.write(new TextEncoder().encode(komut + '\n'));
+    w.releaseLock();
+    if(komut !== 'DURUM') log("→ " + komut);
+  } catch(e) { log("❌ Hata: " + e.message); }
+}
+
+async function okumayaBasla() {
+  const decoder = new TextDecoderStream();
+  port.readable.pipeTo(decoder.writable);
+  const reader = decoder.readable.getReader();
+  let buffer = '';
+  try {
+    while(true) {
+      const {value, done} = await reader.read();
+      if(done) break;
+      buffer += value;
+      const satirlar = buffer.split('\n');
+      buffer = satirlar.pop();
+      for(const satir of satirlar) { if(satir.trim()) isleVeri(satir.trim()); }
+    }
+  } catch(e) { log("❌ Bağlantı koptu"); bagliMi = false; guncelleBaglantiUI(false); }
+}
+
+function isleVeri(veri) {
+  if(veri.startsWith('MOD:')) {
+    const parcalar = veri.split('|');
+    mevcutMod = parcalar[0].replace('MOD:', '');
+    for(let i=1; i<parcalar.length; i++) {
+      const kp = parcalar[i].split(':');
+      if(kp.length === 2) {
+        const no = parseInt(kp[0].replace('K','')) - 1;
+        if(no >= 0 && no < 8) kanalDurum[no] = kp[1] === '1';
+      }
+    }
+    guncelleTumUI();
+  }
+}
+
+function modSec(yeniMod) {
+  if(!bagliMi) { log("❌ Önce bağlanın!"); return; }
+  komutGonder('MOD:' + yeniMod);
+}
+
+function guncelleTumUI() {
+  const modEl = document.getElementById('modDisplay');
+  document.getElementById('btnNumune').className = 'mod-btn' + (mevcutMod === 'NUMUNE' ? ' active-numune' : '');
+  document.getElementById('btnYikama').className = 'mod-btn' + (mevcutMod === 'YIKAMA' ? ' active-yikama' : '');
+  if(mevcutMod === 'NUMUNE') { modEl.textContent = '💧 MOD: NUMUNE'; modEl.className = 'mod-display numune'; }
+  else if(mevcutMod === 'YIKAMA') { modEl.textContent = '🧪 MOD: YIKAMA'; modEl.className = 'mod-display yikama'; }
+  else { modEl.textContent = '● MOD: KAPALI'; modEl.className = 'mod-display'; }
+  for(let i=0; i<8; i++) {
+    const card = document.getElementById('kanal' + (i+1));
+    const durum = card.querySelector('.kanal-durum');
+    if(mevcutMod === 'KAPALI') {
+      card.className = 'kanal-card kapali-mod'; durum.textContent = 'KAPALI';
+    } else if(kanalDurum[i]) {
+      card.className = 'kanal-card ' + (mevcutMod === 'YIKAMA' ? 'acik-yikama' : 'acik-numune');
+      durum.textContent = mevcutMod === 'YIKAMA' ? '🧪 AÇIK' : '💧 AÇIK';
+    } else {
+      card.className = 'kanal-card'; durum.textContent = 'KAPALI';
+    }
+  }
+}
+
+function kanalToggle(no) {
+  if(mevcutMod === 'KAPALI') { log("⚠️ Önce hat seçin!"); return; }
+  komutGonder(kanalDurum[no-1] ? 'KAPAT:' + no : 'AC:' + no);
+}
+
+function log(mesaj) {
+  const box = document.getElementById('logBox');
+  box.innerHTML += new Date().toLocaleTimeString('tr-TR') + ' → ' + mesaj + '<br>';
+  box.scrollTop = box.scrollHeight;
+}
+</script>
+</body>
+</html>
