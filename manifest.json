@@ -2,7 +2,7 @@
   "name": "PP-SPE 8000",
   "short_name": "SPE 8000",
   "description": "Pozitif Basınçlı SPE Kontrol Paneli",
-  "start_url": "/spe8000/spe8000.html",
+  "start_url": "/SPE8000/spe8000.html",
   "display": "standalone",
   "orientation": "portrait",
   "theme_color": "#0a0a0e",
